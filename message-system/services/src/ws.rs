@@ -1,4 +1,3 @@
-// src/ws.rs
 use axum::{
     extract::{State, WebSocketUpgrade},
     response::IntoResponse,
@@ -6,7 +5,7 @@ use axum::{
     Router,
 };
 use futures_util::{SinkExt, StreamExt};
-use log::{error, info};
+use log::{debug, error, info};
 use serde::Deserialize;
 use serde_json::json;
 use tokio::sync::mpsc;
@@ -116,14 +115,14 @@ async fn handle_incoming(
     });
 
     if let Ok(mut conn) = state.redis_pool.get().await {
-            let _: () = redis::cmd("SET")
-                .arg(format!("last_msg:{}", msg.to))
-                .arg(&payload) 
-                .query_async(&mut conn)
-                .await
-                .unwrap_or_default();
-        }
-
+            let list_key = format!("chat history:{}",msg.to);
+            let _:() = redis::pipe()
+            .cmd("LPUSH").arg(&list_key).arg(&payload)
+            .cmd("LTRIM").arg(&list_key).arg(0).arg(19)
+            .query_async(&mut conn)
+            .await
+            .unwrap_or_default();
+    }
     state.send_to_user(&msg.to, payload).await?;  
     Ok(())
 }
@@ -133,6 +132,7 @@ impl AppState {
         let active = self.active_users.lock().await;
         if let Some(tx) = active.get(user_id) {
             let _ = tx.send(msg);
+            debug!("Sent to {}", user_id);         
             Ok(())
         } else {
             Err("User not online")
