@@ -1,8 +1,9 @@
 # chat-sys-rs
 
-Small Rust chat backend built around WebSockets, Kafka, and Redis. It accepts WebSocket clients on `/ws`, forwards messages to online users, caches undelivered messages in Redis, and replays them when the recipient reconnects.
+Minimal Rust chat backend with Axum WebSockets, Kafka-backed message fan-out, and Redis-based offline replay.
 
 [![CI](https://github.com/akshxdevs/chat-sys-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/akshxdevs/chat-sys-rs/actions/workflows/ci.yml)
+[![Rust 2024](https://img.shields.io/badge/Rust-2024-000000?logo=rust)](message-system/Cargo.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Overview
