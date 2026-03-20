@@ -1,14 +1,15 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+pub const OFFLINE_KEY_PREFIX: &str = "offline:";
+
+pub fn offline_messages_key(user_id: &str) -> String {
+    format!("{OFFLINE_KEY_PREFIX}{user_id}")
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::offline_messages_key;
 
     #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    fn builds_offline_key() {
+        assert_eq!(offline_messages_key("alice"), "offline:alice");
     }
 }
